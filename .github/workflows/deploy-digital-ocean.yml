@@ -1,4 +1,4 @@
-name: Terraform
+name: Deploy to Digital Ocean
 
 on:
   push:
@@ -18,11 +18,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Debug - Print environment variables
+        run: env | sort
+
       - name: Check if DO_TOKEN is set
-        run: echo "DO_TOKEN is set"
+        run: |
+          if [ -z "${DO_TOKEN}" ]; then 
+            echo "DO_TOKEN is not set"; 
+            exit 1; 
+          else 
+            echo "DO_TOKEN is set"; 
+          fi
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
-        if: env.DO_TOKEN != ''
 
       - name: Cache Terraform Providers
         uses: actions/cache@v3
@@ -41,12 +49,12 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -parallelism=5
+        run: terraform plan
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -auto-approve -parallelism=5
+        run: terraform apply -auto-approve
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
