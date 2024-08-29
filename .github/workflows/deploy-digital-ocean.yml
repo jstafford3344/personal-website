@@ -13,19 +13,10 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Check if DO_TOKEN is set
-        run: |
-          if [ -z "${{ secrets.DO_TOKEN }}" ]; then 
-            echo "DO_TOKEN is not set"; 
-            exit 1; 
-          else 
-            echo "DO_TOKEN is set"; 
-          fi
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -36,12 +27,8 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -input=false -parallelism=5
-        env:
-          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false -parallelism=5
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -auto-approve -parallelism=5
-        env:
-          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve -parallelism=5
