@@ -29,7 +29,7 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'  # Only apply changes on the main branch
+        if: github.ref == 'refs/heads/master'  # Only apply changes on the master branch
         run: terraform apply -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
