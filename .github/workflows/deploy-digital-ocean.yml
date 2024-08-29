@@ -39,7 +39,7 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve -verbose
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve
 
       - name: Run Ansible Playbook
         run: |
