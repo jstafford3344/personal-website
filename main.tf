@@ -52,6 +52,6 @@ output "floating_ip_address" {
 
 resource "null_resource" "ansible_provision" {
   provisioner "local-exec" {
-    command = "sleep 60 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${digitalocean_floating_ip.web_server_static_ip.ip_address},' -u root --private-key ~/.ssh/newest_digital_ocean ansible/site.yml"
+    command = "sleep 60 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.terraform.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml"
   }
 }

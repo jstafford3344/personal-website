@@ -41,6 +41,10 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve
 
+      - name: Debug Droplet IP
+        run: | 
+            echo "Droplet IP: ${{ steps.terraform.outputs.droplet_ip }}"
+
       - name: Run Ansible Playbook
         run: |
           sleep 60
