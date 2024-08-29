@@ -37,14 +37,6 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false
 
-      - name: Print environment variables
-        run: echo "DO_TOKEN=${{ secrets.DO_TOKEN }}"
-      
-      - name: Test API Token
-        run: |
-          curl -X GET "https://api.digitalocean.com/v2/droplets" \
-          -H "Authorization: Bearer ${{ secrets.DO_TOKEN }}"
-
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
         run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve -verbose
