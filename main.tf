@@ -62,3 +62,4 @@ resource "null_resource" "ansible_provision" {
     digitalocean_floating_ip_assignment.web_server_static_ip_assignment
   ]
 }
+
