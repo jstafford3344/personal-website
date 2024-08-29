@@ -35,11 +35,11 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false -parallelism=5
+        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve -parallelism=5
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve
 
       - name: Run Ansible Playbook
         run: |
