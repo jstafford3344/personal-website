@@ -1,0 +1,18 @@
+server {
+    listen 80;
+    server_name jstafford.xyz;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name jstafford.xyz;
+
+    ssl_certificate /etc/letsencrypt/live/jstafford.xyz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jstafford.xyz/privkey.pem;
+
+    location / {
+        root /var/www/html/personal_resume_website;
+        index index.html;
+    }
+}
