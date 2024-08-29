@@ -13,7 +13,7 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -35,13 +35,13 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false
+        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false -parallelism=5
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve -parallelism=5
 
       - name: Run Ansible Playbook
         run: |
           sleep 60
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.terraform.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa ansible/site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.terraform.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
