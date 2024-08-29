@@ -1,4 +1,4 @@
-name: Deploy to Digital Ocean
+name: Terraform
 
 on:
   push:
@@ -13,32 +13,19 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Debug - Print environment variables
-        run: env | sort
-
       - name: Check if DO_TOKEN is set
         run: |
-          if [ -z "${DO_TOKEN}" ]; then 
+          if [ -z "${{ secrets.DO_TOKEN }}" ]; then 
             echo "DO_TOKEN is not set"; 
             exit 1; 
           else 
             echo "DO_TOKEN is set"; 
           fi
-        env:
-          DO_TOKEN: ${{ secrets.DO_TOKEN }}
-
-      - name: Cache Terraform Providers
-        uses: actions/cache@v3
-        with:
-          path: ~/.terraform.d/plugins
-          key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -49,12 +36,12 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false -parallelism=5
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -parallelism=5
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
