@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - 'personal_resume_website/**'
-      - '.github/workflows/terraform.yml'
+      - '.github/workflows/deploy-digital-ocean.yml'
   pull_request:
     paths:
       - 'personal_resume_website/**'
-      - '.github/workflows/terraform.yml'
+      - '.github/workflows/deploy-digital-ocean.yml'
 
 jobs:
   terraform:
