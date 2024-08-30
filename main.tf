@@ -11,17 +11,19 @@ provider "digitalocean" {
   token = var.DO_TOKEN
 }
 
-resource "digitalocean_ssh_key" "my_key" {
-  name      = "my-ssh-key"
+resource "digitalocean_ssh_key" "deployed_key" {
+  name       = "my-ssh-key"
   public_key = var.SSH_PUBLIC_KEY
 }
 
 resource "digitalocean_droplet" "personal_web_server" {
-  image    = "ubuntu-22-04-x64"
-  name     = "js-ubuntu-personal-resume-website"
-  region   = "nyc1"
-  size     = "s-1vcpu-1gb"
-  ssh_keys = [digitalocean_ssh_key.my_key.id]
+  image  = "ubuntu-22-04-x64"
+  name   = "js-ubuntu-personal-resume-website"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+  ssh_keys = [
+    digitalocean_ssh_key.deployed_key.id
+  ]
 }
 
 resource "digitalocean_floating_ip" "web_server_static_ip" {
@@ -57,7 +59,7 @@ resource "null_resource" "ansible_provision" {
   provisioner "local-exec" {
     command = <<-EOT
       sleep 60 &&
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${digitalocean_floating_ip.web_server_static_ip.ip_address},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.terraform.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
     EOT
   }
 }
