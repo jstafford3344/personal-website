@@ -35,21 +35,17 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        id: plan
-        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -input=false
+        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" -input=false
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master'
-        id: apply
-        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -auto-approve
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" -auto-approve
 
-      - name: Capture Outputs
-        id: outputs
+      - name: Debug Droplet IP
         run: |
-          terraform output droplet_ip
-        continue-on-error: true
+          echo "Droplet IP: ${{ steps.terraform.outputs.droplet_ip }}"
 
       - name: Run Ansible Playbook
         run: |
           sleep 60
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.outputs.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${{ steps.terraform.outputs.droplet_ip }},' -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
