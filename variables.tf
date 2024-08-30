@@ -3,3 +3,9 @@ variable "DO_TOKEN" {
   type        = string
   sensitive   = true
 }
+
+variable "SSH_PUBLIC_KEY" {
+  description = "The DigitalOcean Public Key"
+  type        = string
+  sensitive   = true
+}
