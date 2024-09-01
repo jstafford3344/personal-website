@@ -21,10 +21,6 @@ resource "digitalocean_droplet" "personal_web_server" {
   ]
 }
 
-resource "digitalocean_floating_ip" "web_server_static_ip" {
-  region = "nyc1"
-}
-
 resource "digitalocean_floating_ip_assignment" "web_server_static_ip_assignment" {
   ip_address = digitalocean_floating_ip.web_server_static_ip.ip_address
   droplet_id = digitalocean_droplet.personal_web_server.id
