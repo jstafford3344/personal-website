@@ -96,8 +96,8 @@
     
     - name: Copy Website Files
       copy:
-        src: "{{ playbook_dir }}/../personal_resume_website/"
-        dest: /var/www/html/personal_resume_website/
+        src: "{{ playbook_dir }}/../personal-website/"
+        dest: /var/www/html/personal-website/
         owner: www-data
         group: www-data
         mode: '0755'

@@ -3,11 +3,11 @@ name: Terraform
 on:
   push:
     paths:
-      - 'personal_resume_website/**'
+      - 'personal-website/**'
       - '.github/workflows/deploy-digital-ocean.yml'
   pull_request:
     paths:
-      - 'personal_resume_website/**'
+      - 'personal-website/**'
       - '.github/workflows/deploy-digital-ocean.yml'
 
 jobs:
