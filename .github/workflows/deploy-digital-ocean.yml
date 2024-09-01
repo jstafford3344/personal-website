@@ -32,6 +32,12 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -var="SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" -auto-approve
 
+      - name: Upload Droplet IP
+        uses: actions/upload-artifact@v3
+        with:
+          name: droplet_ip
+          path: droplet_ip.txt
+
   ansible:
     runs-on: ubuntu-latest
     needs: terraform
