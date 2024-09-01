@@ -1,0 +1,55 @@
+name: Provision Infrastructure
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'personal-website/**'
+      - '.github/workflows/terraform.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'personal-website/**'
+      - '.github/workflows/terraform.yml'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -var="SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" -input=false
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -var="DO_TOKEN=${{ secrets.DO_TOKEN }}" -var="SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" -auto-approve
+
+      - name: Save Droplet IP
+        run: echo "${{ steps.terraform.outputs.droplet_ip }}" > droplet_ip.txt
+
+      - name: Upload Droplet IP
+        uses: actions/upload-artifact@v3
+        with:
+          name: droplet_ip
+          path: droplet_ip.txt

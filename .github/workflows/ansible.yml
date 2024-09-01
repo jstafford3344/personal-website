@@ -1,0 +1,40 @@
+name: Configure Nginx
+
+on:
+  workflow_run:
+    workflows: ["Provision Infrastructure"]
+    types:
+      - completed
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Droplet IP
+        uses: actions/download-artifact@v3
+        with:
+          name: droplet_ip
+          path: .
+
+      - name: Display Droplet IP
+        run: |
+          DROPLET_IP=$(cat droplet_ip.txt)
+          echo "Droplet IP: $DROPLET_IP"
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: false
+        run: |
+          DROPLET_IP=$(cat droplet_ip.txt)
+          ansible-playbook -i "${DROPLET_IP}," -u root --private-key ~/.ssh/id_rsa -vvvv ansible/site.yml
