@@ -62,4 +62,6 @@ resource "null_resource" "ansible_provision" {
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${digitalocean_floating_ip.web_server_static_ip.ip_address},' -u root --private-key ~/.ssh/id_rsa ansible/site.yml
     EOT
   }
+
+  depends_on = [digitalocean_floating_ip_assignment.web_server_static_ip_assignment]
 }
