@@ -11,18 +11,13 @@ provider "digitalocean" {
   token = var.DO_TOKEN
 }
 
-resource "digitalocean_ssh_key" "deployed_key" {
-  name       = "my-ssh-key"
-  public_key = var.SSH_PUBLIC_KEY
-}
-
 resource "digitalocean_droplet" "personal_web_server" {
   image  = "ubuntu-22-04-x64"
   name   = "js-ubuntu-personal-resume-website"
   region = "nyc1"
   size   = "s-1vcpu-1gb"
   ssh_keys = [
-    digitalocean_ssh_key.deployed_key.id
+    var.SSH_PUBLIC_KEY
   ]
 }
 
